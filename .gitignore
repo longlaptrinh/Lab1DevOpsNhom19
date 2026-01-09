@@ -1,0 +1,15 @@
+# Ignore Key Pair (BAT BUOC)
+*.pem
+
+# Ignore Terraform Directories and State (BAT BUOC)
+.terraform/
+**/.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+
+# Ignore System Files
+.DS_Store
+Thumbs.db
+*.exe
+*.log

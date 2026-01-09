@@ -1,0 +1,75 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Main Stack - Lab 1 DevOps Nhom 19
+Parameters:
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+  VpcCIDR:
+    Type: String
+    Default: 10.20.0.0/16
+  PublicSubnetCIDR:
+    Type: String
+    Default: 10.20.1.0/24
+  PrivateSubnetCIDR:
+    Type: String
+    Default: 10.20.2.0/24
+Resources:
+  NetworkingStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3.us-east-1.amazonaws.com/cf-templates-nhom19-286504933/9867174fede60826e328d69fc7ac1e46.template
+      Parameters:
+        VpcCIDR:
+          Ref: VpcCIDR
+        PublicSubnetCIDR:
+          Ref: PublicSubnetCIDR
+        PrivateSubnetCIDR:
+          Ref: PrivateSubnetCIDR
+  SecurityStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3.us-east-1.amazonaws.com/cf-templates-nhom19-286504933/ea0ace1026fd7be1ad396122a6abe8b9.template
+      Parameters:
+        VpcId:
+          Fn::GetAtt:
+          - NetworkingStack
+          - Outputs.VpcId
+  Ec2Stack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3.us-east-1.amazonaws.com/cf-templates-nhom19-286504933/113da92d9f5e3d340fb87af57a1c926a.template
+      Parameters:
+        KeyName:
+          Ref: KeyName
+        PublicSubnetId:
+          Fn::GetAtt:
+          - NetworkingStack
+          - Outputs.PublicSubnetId
+        PrivateSubnetId:
+          Fn::GetAtt:
+          - NetworkingStack
+          - Outputs.PrivateSubnetId
+        PublicSGId:
+          Fn::GetAtt:
+          - SecurityStack
+          - Outputs.PublicSGId
+        PrivateSGId:
+          Fn::GetAtt:
+          - SecurityStack
+          - Outputs.PrivateSGId
+Outputs:
+  JumpServerIP:
+    Description: Public IP cua Jump Server
+    Value:
+      Fn::GetAtt:
+      - Ec2Stack
+      - Outputs.PublicIP
+  DBServerIP:
+    Description: Private IP cua Database Server
+    Value:
+      Fn::GetAtt:
+      - Ec2Stack
+      - Outputs.PrivateIP
+  SSHConnect:
+    Description: Lenh ket noi nhanh
+    Value:
+      Fn::Sub: ssh -i ${KeyName}.pem ec2-user@${Ec2Stack.Outputs.PublicIP}

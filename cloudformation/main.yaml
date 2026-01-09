@@ -1,0 +1,57 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Main Stack - Lab 1 DevOps Nhom 19
+
+Parameters:
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+  VpcCIDR:
+    Type: String
+    Default: 10.20.0.0/16
+  PublicSubnetCIDR:
+    Type: String
+    Default: 10.20.1.0/24
+  PrivateSubnetCIDR:
+    Type: String
+    Default: 10.20.2.0/24
+
+Resources:
+  # 1. Goi Module Network
+  NetworkingStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: modules/networking.yaml
+      Parameters:
+        VpcCIDR: !Ref VpcCIDR
+        PublicSubnetCIDR: !Ref PublicSubnetCIDR
+        PrivateSubnetCIDR: !Ref PrivateSubnetCIDR
+
+  # 2. Goi Module Security
+  SecurityStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: modules/security.yaml
+      Parameters:
+        VpcId: !GetAtt NetworkingStack.Outputs.VpcId
+
+  # 3. Goi Module EC2 
+  Ec2Stack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: modules/ec2.yaml  
+      Parameters:
+        KeyName: !Ref KeyName
+        PublicSubnetId: !GetAtt NetworkingStack.Outputs.PublicSubnetId
+        PrivateSubnetId: !GetAtt NetworkingStack.Outputs.PrivateSubnetId
+        PublicSGId: !GetAtt SecurityStack.Outputs.PublicSGId
+        PrivateSGId: !GetAtt SecurityStack.Outputs.PrivateSGId
+
+Outputs:
+  JumpServerIP:
+    Description: Public IP cua Jump Server
+    Value: !GetAtt Ec2Stack.Outputs.PublicIP
+  DBServerIP:
+    Description: Private IP cua Database Server
+    Value: !GetAtt Ec2Stack.Outputs.PrivateIP
+  SSHConnect:
+    Description: Lenh ket noi nhanh
+    Value: !Sub "ssh -i ${KeyName}.pem ec2-user@${Ec2Stack.Outputs.PublicIP}"

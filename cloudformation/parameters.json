@@ -1,0 +1,10 @@
+[
+  {
+    "ParameterKey": "KeyName",
+    "ParameterValue": "keyec2nhom19"
+  },
+  {
+    "ParameterKey": "VpcCIDR",
+    "ParameterValue": "10.20.0.0/16"
+  }
+]

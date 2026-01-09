@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Module EC2 Instances
+
+Parameters:
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+  PublicSubnetId:
+    Type: String
+  PrivateSubnetId:
+    Type: String
+  PublicSGId:
+    Type: String
+  PrivateSGId:
+    Type: String
+  LatestAmiId:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+
+Resources:
+  JumpServer:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t3.micro
+      ImageId: !Ref LatestAmiId
+      KeyName: !Ref KeyName
+      SubnetId: !Ref PublicSubnetId
+      SecurityGroupIds: [!Ref PublicSGId]
+      Tags: [{Key: Name, Value: JumpServer-CF}]
+
+  DatabaseServer:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t3.micro
+      ImageId: !Ref LatestAmiId
+      KeyName: !Ref KeyName
+      SubnetId: !Ref PrivateSubnetId
+      SecurityGroupIds: [!Ref PrivateSGId]
+      Tags: [{Key: Name, Value: DatabaseServer-CF}]
+
+Outputs:
+  PublicIP:
+    Value: !GetAtt JumpServer.PublicIp
+  PrivateIP:
+    Value: !GetAtt DatabaseServer.PrivateIp
