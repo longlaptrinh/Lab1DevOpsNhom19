@@ -6,10 +6,13 @@ Dự án triển khai hạ tầng mạng (VPC), máy chủ (EC2) và NAT Gateway
 
 ## Cấu trúc dự án
 
+## 2. Cấu trúc dự án
+```text
 Lab1-DevOps-Nhom19/
 ├── cloudformation/     # Mã nguồn CloudFormation (YAML) & Scripts
 ├── terraform/          # Mã nguồn Terraform (HCL)
 └── README.md           # Hướng dẫn sử dụng
+```
 3. Hướng dẫn chạy Terraform
 Di chuyển vào thư mục Terraform:
 cd terraform
