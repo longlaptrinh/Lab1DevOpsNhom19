@@ -2,6 +2,9 @@
 
 Dự án triển khai hạ tầng mạng (VPC), máy chủ (EC2) và NAT Gateway trên AWS sử dụng 2 công cụ IaC: **Terraform** và **CloudFormation**.
 
+1. Chuẩn bị
+   - Tìm IP Public của máy mình
+   - Tạo Key Pair Trên AWS
 
 
 ## Cấu trúc dự án
@@ -14,7 +17,7 @@ Lab1-DevOps-Nhom19/
 └── README.md           # Hướng dẫn sử dụng
 ```
 3. Hướng dẫn chạy Terraform
-Di chuyển vào thư mục Terraform:
+Di chuyển vào thư mục Terraform (Đã có file key .pem trong folder):
 ```
 cd terraform
 ```
@@ -30,12 +33,20 @@ Bước 3: Triển khai (Apply)
 ```
 terraform apply -auto-approve
 ```
-Bước 4: Hủy tài nguyên (Destroy)
+Bước 4: Dùng SSH Key để kết nối
+```
+# Add SSH key to agent for forwarding
+ssh-add <YOUR_KEY_PAIR_NAME>.pem
+
+# Connect to bastion host
+ssh -A -i <YOUR_KEY_PAIR_NAME>.pem ec2-user@<PUBLIC_IP>
+```
+Bước 5: Hủy tài nguyên (Destroy)
 ```
 terraform destroy -auto-approve
 ```
-4. Hướng dẫn chạy CloudFormation
-Di chuyển vào thư mục CloudFormation:
+4. Hướng dẫn chạy CloudFormation 
+Sau khi đã sửa thông tin trong cloudformation/parameters.json. Di chuyển vào thư mục CloudFormation:
 ```
 cd ../cloudformation
 ```
